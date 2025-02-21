@@ -1,0 +1,3 @@
+/home/y.komarevtsev/paralelki/build/CMakeFiles/sin_array_sum.dir
+/home/y.komarevtsev/paralelki/build/CMakeFiles/edit_cache.dir
+/home/y.komarevtsev/paralelki/build/CMakeFiles/rebuild_cache.dir
