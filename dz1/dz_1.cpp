@@ -23,7 +23,7 @@ int main() {
     for (size_t i = 0; i < N; ++i) {
         sum += arr[i];
     }
-    std::cout << "Sum: " << sum << '\n';
+    std::cout << "Sum: " << sum << '\n'; 
 
     return 0;
 
