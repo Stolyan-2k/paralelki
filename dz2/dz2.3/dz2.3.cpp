@@ -14,6 +14,16 @@ double norm(std::vector<double> v, int n) {
     return sqrt(sum);
 }
 
+double norm1(std::vector<double> v, int n) {
+    double sum = 0.0;
+    #pragma omp for reduction(+:sum)
+    for (int i = 0; i < n; ++i) {
+        sum += v[i] * v[i];
+    }
+    return sqrt(sum);
+}
+
+
 void solve_serial(std::vector<double> a, std::vector<double> b, int n, int iterations, double eps, const double r) {
     std::vector<double> x_cur(n, 0.0);
     std::vector<double> x_new(n);
@@ -113,13 +123,13 @@ double solve_parallel_2(std::vector<double> a, std::vector<double> b, int n, int
     std::vector<double> x_new(n);
 
     double t = omp_get_wtime();
-
+    #pragma omp parallel
     for (int iter = 0; iter < iterations; ++iter) {
         std::vector<double> Ax(n, 0.0);
         std::vector<double> residual(n);
 
         // Распараллеливаем вычисление Ax
-        #pragma omp parallel for schedule(static)
+        #pragma omp for schedule(static)
         for (int i = 0; i < n; ++i) {
             double temp = 0.0;
             for (int j = 0; j < n; ++j) {
@@ -129,9 +139,10 @@ double solve_parallel_2(std::vector<double> a, std::vector<double> b, int n, int
             residual[i] = temp - b[i];
             x_new[i] = x_cur[i] - (r * residual[i]);
         }
-
-        double norm_b = norm(b, n);
-        double norm_res = norm(residual, n);
+        
+        
+        double norm_b = norm1(b, n);
+        double norm_res = norm1(residual, n);
 
         double error = norm_res / norm_b;
 
@@ -164,7 +175,9 @@ int main() {
     int nthreads = omp_get_max_threads();
     std::cout << nthreads << "\n"; 
     std::cout << "Starting to compute...\n";
-    solve_serial(a, b, n, 12000, 1e-05, 0.001);
+    double t = solve_parallel_2(a, b, n, 12000, 1e-05, 0.001, 80);
+    std::cout << t;
+    // solve_serial(a, b, n, 12000, 1e-05, 0.001);
     // double t[10] = {0.0};
 
     // for(int i = 0; i < 5; ++i){
